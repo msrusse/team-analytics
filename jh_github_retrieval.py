@@ -3,6 +3,8 @@
 import requests, json, os, csv
 from contextlib import closing
 from bs4 import BeautifulSoup as BS
+import pandas as pd
+import numpy as np
 
 def get_github_hrefs():
     r=requests.get('https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series')
@@ -14,9 +16,17 @@ def get_github_hrefs():
 def get_github_csvs(hrefs):
     for href in hrefs:
         url = 'https://raw.githubusercontent.com/%s' % href[0].replace('/blob', '')
-        with open ('data/%s' % href[1], 'wb') as f, requests.get(url, stream=True) as r:
-            for line in r.iter_lines():
-                f.write(line + '\n'.encode())
+        df = pd.read_csv(url)
+        df.drop(columns=['UID', 'iso2', 'iso3', 'code3', 'Country_Region', 'Lat', 'Long_', 'Combined_Key'], inplace=True)
+        df.rename(columns={'Admin2' : 'county', 'Province_State' : 'state'}, inplace=True)
+        if 'Population' in df.columns:
+            pop_df = df[['FIPS', 'county', 'state', 'Population']].copy()
+            pop_df.to_csv('data/county_population.csv', sep=',')
+            df.drop(columns=['Population'], inplace=True)
+        date_columns = list(df.columns[3:])
+        df = df.melt(id_vars=['FIPS', 'county', 'state'], value_vars=date_columns)
+        df.rename(columns={'variable' : 'date', 'value': 'total'}, inplace=True)
+        df.to_csv('data/%s' % href[1], sep=',', index=False)
 
 def main():
     hrefs = get_github_hrefs()
