@@ -1,0 +1,67 @@
+CREATE TABLE state (
+	stateAbbrev CHAR(2) NOT NULL PRIMARY KEY,
+	stateName CHAR(15),
+	)
+GO
+
+CREATE TABLE countyInfo (
+	FIPSCode int PRIMARY KEY NOT NULL,
+	stateFIPS int NOT NULL,
+	countyFIPS int NOT NULL,
+	stateAbbrev char(2) NOT NULL FOREIGN KEY REFERENCES state(stateAbbrev),
+	countyName varchar(30) NOT NULL
+	)
+GO
+
+CREATE TABLE deathInfo (
+	deathID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	FIPSCode INT NOT NULL FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	recordedDate DATE NOT NULL,
+	totalToDate INT NOT NULL,
+	amountChange INT NOT NULL DEFAULT(0)
+	)
+GO
+
+CREATE TABLE caseInfo (
+	caseID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	FIPSCode INT NOT NULL FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	recordedDate DATE NOT NULL,
+	totalToDate INT NOT NULL,
+	amountChange INT NOT NULL DEFAULT(0)
+	)
+GO
+
+CREATE TABLE icuBeds (
+	FIPSCode INT PRIMARY KEY NOT NULL FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	icuBedCount INT NOT NULL
+	)
+GO
+
+CREATE TABLE countyPopulation (
+	FIPSCode INT PRIMARY KEY NOT NULL FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	totalPopulation INT NOT NULL,
+	totalPopulationOver60 INT NOT NULL
+	)
+GO
+
+CREATE TABLE party (
+	partyID CHAR(3) NOT NULL PRIMARY KEY,
+	partyName VARCHAR(20)
+	)
+GO
+
+CREATE TABLE candidate (
+	candidateID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	firstName VARCHAR(25),
+	lastName VARCHAR(35),
+	partyID CHAR(3) FOREIGN KEY REFERENCES party(partyID)
+	)
+GO
+
+CREATE TABLE electionResult (
+	FIPSCode INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	candidateID INT NOT NULL FOREIGN KEY REFERENCES candidate(candidateID),
+	totalVotes INT NOT NULL,
+	won BIT NOT NULL
+	)
+GO
