@@ -46,7 +46,7 @@ GO
 
 CREATE TABLE party (
 	partyID CHAR(3) NOT NULL PRIMARY KEY,
-	partyName VARCHAR(20)
+	partyName VARCHAR(35)
 	)
 GO
 
@@ -54,12 +54,14 @@ CREATE TABLE candidate (
 	candidateID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	firstName VARCHAR(25),
 	lastName VARCHAR(35),
-	partyID CHAR(3) FOREIGN KEY REFERENCES party(partyID)
+	partyID CHAR(3) FOREIGN KEY REFERENCES party(partyID),
+	candidateType VARCHAR(20) NOT NULL
 	)
 GO
 
 CREATE TABLE electionResult (
-	FIPSCode INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES countyInfo(FIPSCode),
+	electionResultID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	FIPSCode INT NOT NULL FOREIGN KEY REFERENCES countyInfo(FIPSCode),
 	candidateID INT NOT NULL FOREIGN KEY REFERENCES candidate(candidateID),
 	totalVotes INT NOT NULL,
 	won BIT NOT NULL
