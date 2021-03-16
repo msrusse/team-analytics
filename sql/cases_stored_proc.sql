@@ -11,11 +11,11 @@ ELSE
 
 IF @Date IN (SELECT recordedDate FROM caseInfo WHERE FIPSCode = @ActualFIPS)
     UPDATE caseInfo
-    SET totalToDate = @TotalCases, amountChange = @TotalCases - (
+    SET totalToDate = @TotalCases, amountChange = @TotalCases - ISNULL((
             SELECT totalToDate
             FROM caseInfo
             WHERE FIPSCode = @ActualFIPS AND recordedDate = DATEADD(DAY, -1, @Date)
-        )
+        ),0)
     WHERE FIPSCode = @ActualFIPS AND recordedDate = @Date
 ELSE
     INSERT INTO caseInfo (
@@ -28,10 +28,10 @@ ELSE
         @ActualFIPS,
         @Date,
         @TotalCases,
-        @TotalCases - (
+        @TotalCases - ISNULL((
             SELECT totalToDate
             FROM caseInfo
             WHERE FIPSCode = @ActualFIPS AND recordedDate = DATEADD(DAY, -1, @Date)
-        )
+        ),0)
     )
 GO
