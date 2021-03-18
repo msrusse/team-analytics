@@ -21,7 +21,7 @@ def get_github_csvs(hrefs):
         df.rename(columns={'Admin2' : 'county', 'Province_State' : 'state'}, inplace=True)
         if 'Population' in df.columns:
             pop_df = df[['FIPS', 'county', 'state', 'Population']].copy()
-            pop_df.to_csv('data/county_population.csv', sep=',')
+            pop_df.to_csv('data/county_population.csv', sep=',', index=False)
             df.drop(columns=['Population'], inplace=True)
         date_columns = list(df.columns[3:])
         df = df.melt(id_vars=['FIPS', 'county', 'state'], value_vars=date_columns)
