@@ -1,2 +1,4 @@
 .env
 data/
+sql/case_data/
+sql/death_data/

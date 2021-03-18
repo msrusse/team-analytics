@@ -19,6 +19,7 @@ IF @ActualFIPS IN (SELECT FIPSCode FROM countyInfo)
         countyFIPS = @CountyFIPS,
         stateAbbrev = @StateAbbrev,
         countyName = @County
+    WHERE FIPSCode = @ActualFIPS
 ELSE
     INSERT INTO countyInfo (
         FIPSCode,
