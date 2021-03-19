@@ -5,8 +5,8 @@ DECLARE @ActualFIPS CHAR(5)
 
 SET @ActualFIPS = (SELECT FIPSCode FROM countyInfo ci
                     JOIN state s ON s.stateAbbrev = ci.stateAbbrev
-                    WHERE countyName LIKE @County
-                    AND stateName LIKE @StateName)
+                    WHERE countyName LIKE TRIM(@County)
+                    AND stateName LIKE TRIM(@StateName))
 
 IF @ActualFIPS IN (SELECT FIPSCode FROM icuBeds)
     UPDATE icuBeds

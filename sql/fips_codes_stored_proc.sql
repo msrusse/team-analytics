@@ -1,4 +1,4 @@
-ALTER PROCEDURE fips_codes_data @FIPS VARCHAR(5), @County VARCHAR(30), @StateAbbrev CHAR(2) = NULL, @StateName VARCHAR(25) = NULL
+ALTER PROCEDURE fips_codes_data @FIPS VARCHAR(5), @County VARCHAR(35), @StateAbbrev CHAR(2) = NULL, @StateName VARCHAR(25) = NULL
 AS
 DECLARE
     @StateFIPS CHAR(2),
