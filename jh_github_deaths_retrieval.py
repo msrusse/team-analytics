@@ -74,11 +74,11 @@ def main(args):
         cond = bool(args[1])
     dfs = getDeathsData()
     insertUpdateCountyInfo(dfs[1])
-    """if cond:
+    if cond:
         writeResultToSQL(dfs[0])
         runSQLScripts()
     updateLastFiveDays(dfs[0])
-    updatePopulationData(dfs[1])"""
+    updatePopulationData(dfs[1])
 
 if __name__ == '__main__':
     main(argv)
