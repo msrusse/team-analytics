@@ -13,12 +13,22 @@ import numpy as np
 def getDeathsData():
     url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv'
     df = pd.read_csv(url).dropna()
-    df.drop(columns=['UID', 'iso2', 'iso3', 'code3', 'Admin2', 'Province_State', 'Country_Region', 'Lat', 'Long_', 'Combined_Key'], inplace=True)
-    pop_df = df[['FIPS', 'Population']].copy()
+    df.drop(columns=['UID', 'iso2', 'iso3', 'code3', 'Country_Region', 'Lat', 'Long_', 'Combined_Key'], inplace=True)
+    county_df = df[['FIPS', 'Admin2', 'Province_State', 'Population']].copy()
     date_columns = list(df.columns[3:])
     df = df.melt(id_vars=['FIPS'], value_vars=date_columns)
     df.rename(columns={'variable' : 'date', 'value': 'total'}, inplace=True)
-    return (df, pop_df)
+    return (df, county_df)
+
+def insertUpdateCountyInfo(county_df):
+    cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % (os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), os.getenv('database_username'), os.getenv('database_password')))
+    cursor = cnxn.cursor()
+    for index, row in tqdm(county_df.iterrows()):
+        sql = 'EXEC fips_codes_data @FIPS=?, @County=?, @StateName=?'
+        cursor.execute(sql, row.FIPS, row.Admin2, row.Province_State)
+    cnxn.commit()
+    cursor.close()
+    cnxn.close()
 
 def writeResultToSQL(cases_df):
     df_array = cases_df.values
@@ -63,6 +73,7 @@ def main(args):
     if len(args) >= 2:
         cond = bool(args[1])
     dfs = getDeathsData()
+    insertUpdateCountyInfo(dfs[1])
     if cond:
         writeResultToSQL(dfs[0])
         runSQLScripts()

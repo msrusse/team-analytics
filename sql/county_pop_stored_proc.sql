@@ -1,4 +1,4 @@
-ALTER PROCEDURE county_population_data @FIPS VARCHAR(5) = NULL, @Population INT, @PopulationOver60 INT = NULL, @County VARCHAR(30) = NULL, @State CHAR(25) = NULL
+ALTER PROCEDURE county_population_data @FIPS VARCHAR(5) = NULL, @Population INT, @County VARCHAR(30) = NULL, @State CHAR(25) = NULL
 AS
 
 DECLARE @ActualFIPS CHAR(5)
@@ -15,23 +15,20 @@ ELSE
         WHERE s.stateName = @State AND c.countyName = @County
     )
 
-IF @Population < (SELECT totalPopulation FROM countyPopulation WHERE FIPSCode = @ActualFIPS)
-    SET @Population = (SELECT totalPopulation FROM countyPopulation WHERE FIPSCode = @ActualFIPS)
+IF @Population < (SELECT totalPopulation FROM countyDemographics WHERE FIPSCode = @ActualFIPS)
+    SET @Population = (SELECT totalPopulation FROM countyDemographics WHERE FIPSCode = @ActualFIPS)
 
 IF @ActualFIPS IN (SELECT FIPSCode FROM countyInfo)
-    IF @ActualFIPS IN (SELECT FIPSCode FROM countyPopulation)
-        UPDATE countyPopulation
-        SET totalPopulation = @Population,
-            totalPopulationOver60 = ISNULL(@PopulationOver60, (SELECT totalPopulationOver60 FROM countyPopulation WHERE FIPSCode = @ActualFIPS))
+    IF @ActualFIPS IN (SELECT FIPSCode FROM countyDemographics)
+        UPDATE countyDemographics
+        SET totalPopulation = @Population
         WHERE FIPSCode = @ActualFIPS
     ELSE
-        INSERT INTO countyPopulation (
+        INSERT INTO countyDemographics (
             FIPSCode,
-            totalPopulation,
-            totalPopulationOver60
+            totalPopulation
         ) VALUES (
             @ActualFIPS,
-            @Population,
-            ISNULL(@PopulationOver60,0)
+            @Population
         )
 GO
