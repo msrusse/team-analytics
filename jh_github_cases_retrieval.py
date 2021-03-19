@@ -32,7 +32,7 @@ def writeResultToSQL(cases_df):
 def runSQLScripts():
     os.chdir('sql/case_data/')
     for file_name in tqdm(glob.glob('*.sql')):
-        os.system('sqlcmd -U %s -P %s -S %s,%s -d %s -i "%s" -o "sql_load_output.txt"' % (os.getenv('database_username'), os.getenv('database_password'), os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), file_name))
+        os.system('sqlcmd -U %s -P %s -S %s,%s -d %s -i "%s" -o "%s_output.txt"' % (os.getenv('database_username'), os.getenv('database_password'), os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), file_name, file_name))
 
 def updateLastFiveDays(cases_df):
     five_days_ago = (datetime.today() - timedelta(days=5))
