@@ -48,31 +48,14 @@ def writeZillowHomeValueToSQL(df):
                 sql_file.write('EXEC zillow_home_data @StateFIPSCode=\'%s\', @CountyFIPSCode=\'%s\', @Date=\'%s\', @Price=%s;\n' % (row[0], row[1], row[2], row[3]))
         current_sql_file += 1
 
-    # server = '%s,%s' % (os.getenv('database_url'), os.getenv('database_port'))
-    # cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s' % (server, os.getenv('database_name'), os.getenv('database_username'), os.getenv('database_password')))
-    # cursor = cnxn.cursor()
-    # for index, row in tqdm(df.iterrows()):
-    #     sql = """\
-    #         EXEC zillow_home_data
-    #         @StateFIPSCode=?,
-    #         @CountyFIPSCode=?,
-    #         @Date=?,
-    #         @Price=?
-    #         """
-    #     cursor.execute(sql, row.StateCodeFIPS, row.MunicipalCodeFIPS, row.date, row.medianPrice)
-    # cnxn.commit()
-    # cursor.close()
-    # cnxn.close()
-
 def runSQLScripts():
     os.chdir('sql/zillow_data/')
     for file_name in tqdm(glob.glob('*.sql')):
         os.system('sqlcmd -U %s -P %s -S %s,%s -d %s -i "%s" -o "%s_output.txt"' % (os.getenv('database_username'), os.getenv('database_password'), os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), file_name, file_name))
 
-
 def main():
     dfs = getCasesData()
-    #callZillowCountyInfo(dfs[1])
+    callZillowCountyInfo(dfs[1])
     writeZillowHomeValueToSQL(dfs[0])
     runSQLScripts()
 
