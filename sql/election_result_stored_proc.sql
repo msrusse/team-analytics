@@ -29,8 +29,8 @@ SET @ActualFIPS = (SELECT FIPSCode FROM countyInfo
 
 SET @Won = 0
 
-IF @VoteCount >= (SELECT MAX(totalVotes) FROM electionResult
-                    WHERE FIPSCode = @ActualFIPS)
+IF @VoteCount >= ISNULL((SELECT MAX(totalVotes) FROM electionResult
+                    WHERE FIPSCode = @ActualFIPS),0)
     SET @Won = 1
 
 UPDATE electionResult
