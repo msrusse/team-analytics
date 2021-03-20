@@ -32,7 +32,7 @@ def getCountyElectionResults(state_abbrevs):
         if counties_container:
             county_divs = counties_container.findAll('div', {'class' : 'results-fips-item'})
             for county in county_divs:
-                county_name = county.find('h4').text.replace(' County', '')
+                county_name = county.find('h4').text.replace(' County', '').replace(' Parish', '')
                 all_candidates = county.findAll('tr', {'class' : 'result-county-table-row'})
                 for candidate in all_candidates:
                     td = candidate.findAll('td')
