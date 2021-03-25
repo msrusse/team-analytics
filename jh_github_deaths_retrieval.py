@@ -13,8 +13,8 @@ import numpy as np
 def getDeathsData():
     url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv'
     df = pd.read_csv(url).dropna()
-    df.drop(columns=['UID', 'iso2', 'iso3', 'code3', 'Country_Region', 'Lat', 'Long_', 'Combined_Key'], inplace=True)
     county_df = df[['FIPS', 'Admin2', 'Province_State', 'Population']].copy()
+    df.drop(columns=['UID', 'iso2', 'iso3', 'code3', 'Population', 'Country_Region', 'Lat', 'Long_', 'Combined_Key'], inplace=True)
     date_columns = list(df.columns[3:])
     df = df.melt(id_vars=['FIPS'], value_vars=date_columns)
     df.rename(columns={'variable' : 'date', 'value': 'total'}, inplace=True)
@@ -46,7 +46,7 @@ def runSQLScripts():
         os.system('sqlcmd -U %s -P %s -S %s,%s -d %s -i "%s" -o "%s_output.txt"' % (os.getenv('database_username'), os.getenv('database_password'), os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), file_name, file_name))
 
 def updateLastFiveDays(deaths_df):
-    five_days_ago = (datetime.today() - timedelta(days=2))
+    five_days_ago = (datetime.today() - timedelta(days=5))
     deaths_df['date'] = pd.to_datetime(deaths_df.date)
     filtered_cases_df = deaths_df.loc[(deaths_df.date >= five_days_ago)]
     cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % (os.getenv('database_url'), os.getenv('database_port'), os.getenv('database_name'), os.getenv('database_username'), os.getenv('database_password')))
